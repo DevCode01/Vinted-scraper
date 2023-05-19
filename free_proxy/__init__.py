@@ -1,0 +1,1 @@
+from alert_bot.bot import discord_alert_vinted_bot
