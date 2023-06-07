@@ -6,7 +6,6 @@ from free_proxy.f_proxy import choose_proxy
 
 def send_discord_notification(title, description, link, image_url, discord_url):
     webhook_url = discord_url
-    discord = Discord(url=webhook_url)
 
     ########################################
     # PROXY SETUP #

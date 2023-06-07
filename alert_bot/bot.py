@@ -4,7 +4,7 @@ import requests
 import time
 import discord_notification.notification as notif
 from clean_url.clean_url import clean_url
-from free_proxy.f_proxy import choose_proxy
+from free_proxy.f_proxy import choose_proxy, choose_proxy_with_previous_proxy
 
 
 def discord_alert_vinted_bot(urlvinted, discord_url):
@@ -17,7 +17,6 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
 
     generate_random_number_proxy = random.randint(0, 299)
     # PROXY URL
-    print(choose_proxy(generate_random_number_proxy))
     proxy = "f"+str(choose_proxy(generate_random_number_proxy))
 
 ########################################
@@ -55,16 +54,39 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
         'Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36',
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9',
     ]
+
     # RANDOM USER AGENT
     random_user_agent = random.choice(user_agents)
+
+    languages = [
+        "en-US",
+        "fr-FR",
+        "es-ES",
+        "de-DE",
+        "ja-JP"
+    ]
+
+    # RANDOM LANGUAGES
+    random_languages = random.choice(languages)
+
+    cache_controls = [
+        "no-cache",
+        "max-age=3600",
+        "no-store",
+        "public, max-age=86400",
+        "private, must-revalidate"
+    ]
+
+    # RANDOM CACHE CONTROLS
+    random_cache_controls = random.choice(cache_controls)
 
     #RANDOM HEADERS
     headers = {
         'User-Agent': random_user_agent,
         'accept-encoding': 'gzip, deflate, br',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
-        'cache-control': 'max-age=0',
+        'Accept-Language': random_languages,
+        'cache-control': random_cache_controls,
         'sec-fetch-dest': 'document',
         'sec-fetch-mode': 'navigate',
         'sec-fetch-site': 'same-origin',
@@ -82,7 +104,6 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
     session2 = session.get('https://www.vinted.be/catalog?search_text=nike')
     # GET COOKIE
     cookie_vinted = session2.cookies.get_dict().get('_vinted_fr_session', "")
-    print(cookie_vinted)
     # SET COOKIE
     session.cookies.set('_vinted_fr_session', cookie_vinted)
     # REQUEST with proxy
@@ -97,7 +118,7 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
                 # LOOP (dirty) #
     ########################################
     while True:
-        time.sleep(5)
+        time.sleep(3)
 
     ########################################
             # PROXY SETUP (again) #
@@ -105,16 +126,14 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
 
         generate_random_number_proxy = random.randint(0, 299)
         # PROXY URL
-        print(choose_proxy(generate_random_number_proxy))
-        proxy = "f" + str(choose_proxy(generate_random_number_proxy))
+        proxy = "f" + str(choose_proxy_with_previous_proxy(generate_random_number_proxy, proxy))
 
         # NEW SESSION
         session = requests.Session()
         session.headers.update(headers)
-        session2 = session.get('https://www.vinted.be/catalog?search_text=nike')
+        session2 = session.get(urlvinted)
         # GET COOKIE
         cookie_vinted = session2.cookies.get_dict().get('_vinted_fr_session', "")
-        print(cookie_vinted)
         # SET COOKIE
         session.cookies.set('_vinted_fr_session', cookie_vinted)
 
@@ -132,7 +151,7 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
             vinted_url,
             headers=headers, proxies={
                 'http': proxy
-            })
+            }, verify=False)
 
         items_found = response.json().get('items')
 
@@ -148,6 +167,7 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
             timestamps.sort()
             # IF TIMESTAMP > LAST_TIMESTAMP AND TIMESTAMP-NOW <= 60 seconds
             for timestamp in timestamps:
+                print("TIMESTAMP")
                 print(timestamp - calendar.timegm(time.gmtime()))
                 for item in items_found:
                     if item and item['photo'] and item['photo']['high_resolution'] and item['photo']['high_resolution']['timestamp'] == timestamp:
@@ -155,7 +175,6 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
                         if item_id not in previous_items:
                             default_timestamp = timestamp
                             previous_items.add(item_id)
-
                             # GET TITLE
                             title = item['title']
                             # GET BRAND TITLE LIKE NIKE, ADIDAS, ...
