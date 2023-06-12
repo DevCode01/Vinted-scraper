@@ -60,16 +60,6 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
     # RANDOM USER AGENT
     random_user_agent = random.choice(user_agents)
 
-    languages = [
-        "en-US",
-        "fr-FR",
-        "es-ES",
-        "de-DE",
-        "ja-JP"
-    ]
-
-    # RANDOM LANGUAGES
-    random_languages = random.choice(languages)
 
     cache_controls = [
         "no-cache",
@@ -87,7 +77,7 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
         'User-Agent': random_user_agent,
         'accept-encoding': 'gzip, deflate, br',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        'Accept-Language': random_languages,
+        'Accept-Language': 'fr-FR',
         'cache-control': random_cache_controls,
         'sec-fetch-dest': 'document',
         'sec-fetch-mode': 'navigate',
