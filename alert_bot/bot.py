@@ -5,13 +5,15 @@ import time
 import discord_notification.notification as notif
 from clean_url.clean_url import clean_url
 from free_proxy.f_proxy import choose_proxy, choose_proxy_with_previous_proxy
+import urllib3
 
 
 def discord_alert_vinted_bot(urlvinted, discord_url):
     vinted_url = clean_url(urlvinted)
     print(vinted_url)
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-########################################
+    ########################################
             # PROXY SETUP #
 ########################################
 
