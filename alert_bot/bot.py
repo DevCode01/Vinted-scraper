@@ -123,17 +123,35 @@ def discord_alert_vinted_bot(urlvinted, discord_url):
         # NEW SESSION
         session = requests.Session()
         session.headers.update(headers)
-        session2 = session.get(urlvinted)
+        session2 = session.get('https://www.vinted.be/catalog?search_text=nike')
         # GET COOKIE
         cookie_vinted = session2.cookies.get_dict().get('_vinted_fr_session', "")
         # SET COOKIE
         session.cookies.set('_vinted_fr_session', cookie_vinted)
 
+        cache_controls = [
+            "no-cache",
+            "max-age=3600",
+            "no-store",
+            "public, max-age=86400",
+            "private, must-revalidate"
+        ]
+
+        # RANDOM CACHE CONTROLS
+        random_cache_controls = random.choice(cache_controls)
+
         random_user_agent = random.choice(user_agents)
         headers = {
             'User-Agent': random_user_agent,
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'en',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'accept-encoding': 'gzip, deflate, br',
+            'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+            'cache-control': random_cache_controls,
+            'sec-fetch-dest': 'document',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-user': '?1',
+            'upgrade-insecure-request': "1",
             'DNT': '1',
             'Connection': 'keep-alive',
             'TE': 'Trailers',
